@@ -87,49 +87,32 @@ If no issues are detected, the script outputs:
 All repositories are up-to-date.
 ```
 
-
 ---
 
 ## Installation
 
 ### Steps to Make the Script Accessible Globally
 
-1. **Move the script to a directory in your PATH**:
+1. **Copy the scripts to a directory in your PATH**:
    - To see directories in your PATH, run:
      ```bash
      echo $PATH
      ```
-   - Common directories include `/usr/local/bin`. Move the script there:
+   - Common directories include `/usr/local/bin`. Copy the script there:
      ```bash
-     sudo mv check_git_status.sh /usr/local/bin/
+     sudo cp check_git_status.sh /usr/local/bin/
      ```
-   - Alternatively, create a `~/bin` directory:
-     ```bash
-     mkdir -p ~/bin
-     mv check_git_status.sh ~/bin/
-     ```
-
+   - Copy the autocompletion script:
+      ```bash
+      sudo cp check_git_status /etc/bash_completion.d/
+      ```
 2. **Grant Execute Permissions**:
    ```bash
    chmod +x /usr/local/bin/check_git_status.sh
-   ```
-   If placed in `~/bin`:
-   ```bash
-   chmod +x ~/bin/check_git_status.sh
+   chmod +x /etc/bash_completion.d/check_git_status
    ```
 
-3. **Update PATH (if necessary)**:
-   If `~/bin` is not in your PATH:
-   - Add the following to `~/.bashrc` or `~/.zshrc`:
-     ```bash
-     export PATH=$PATH:~/bin
-     ```
-   - Reload the shell configuration:
-     ```bash
-     source ~/.bashrc
-     ```
-
-4. **Verify Installation**:
+3. **Verify Installation**:
    You should now be able to run the script from any directory:
    ```bash
    check_git_status.sh

@@ -1,0 +1,9 @@
+# Completamento automatico per check_git_status
+_check_git_status_complete() {
+    local cur=${COMP_WORDS[COMP_CWORD]}
+    local options="fetch debug fetch-debug"
+    COMPREPLY=($(compgen -W "$options" -- "$cur"))
+}
+
+# Registra il completamento per check_git_status
+complete -F _check_git_status_complete check_git_status

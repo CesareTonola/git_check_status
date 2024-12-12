@@ -44,53 +44,36 @@ check_git_status() {
     fi
 
     if [ -d "$dir/.git" ]; then
-        # Fetch remote state if fetch is enabled
-        if [ "$fetch_enabled" == "true" ]; then
+        if [ "$fetch_enabled" == "true" ];then
             git -C "$dir" fetch > /dev/null 2>&1
             if [ "$debug_enabled" == "true" ]; then
                 echo -e "\e[1;33m[DEBUG] Fetch completed for $pkg_name\e[0m"
             fi
         fi
-
-        # Check for untracked files
         if git -C "$dir" status --porcelain | grep -q '^??'; then
             status[$pkg_name]="Modified but not added/committed"
         fi
-
-        # Check for staged changes
         if ! git -C "$dir" diff --cached --quiet; then
             status[$pkg_name]="Staged but not committed"
         fi
-
-        # Check for unstaged changes
         if ! git -C "$dir" diff --quiet; then
             status[$pkg_name]="Modified but not added/committed"
         fi
-
-        # Check if branch is up-to-date with remote (only if fetch is enabled)
         if [ "$fetch_enabled" == "true" ]; then
             if ! git -C "$dir" diff --quiet origin/$(git -C "$dir" branch --show-current); then
                 status[$pkg_name]="Branch not in sync with remote"
             fi
         fi
-
-        # Check for unpushed commits
         local branch=$(git -C "$dir" branch --show-current)
         if [ -n "$(git -C "$dir" log origin/$branch..HEAD 2>/dev/null)" ]; then
             status[$pkg_name]="Committed but not pushed"
         fi
-
-        # # Check for ignored files
-        # if git -C "$dir" status --ignored --porcelain | grep -q '^!!'; then
-        #     status[$pkg_name]="Ignored files present"
-        # fi
     fi
 }
 
 # Main script starts here
 print_header "Checking Git Status of Packages"
 
-# Check if the "fetch" or "debug" argument is provided
 FETCH_ENABLED="false"
 DEBUG_ENABLED="false"
 
@@ -106,7 +89,6 @@ elif [ "$1" == "fetch-debug" ]; then
     echo -e "\e[1;33mFetch and Debug mode enabled: fetching and printing debug information.\e[0m"
 fi
 
-# Determine workspace root
 if [ -d "src" ]; then
     WORKSPACE_DIR=$(pwd)/src
 else
@@ -118,12 +100,10 @@ if [ ! -d "$WORKSPACE_DIR" ]; then
     exit 1
 fi
 
-# Iterate over all directories in the workspace
 for dir in "$WORKSPACE_DIR"/*; do
     if [ -d "$dir" ]; then
         check_git_status "$dir" "$FETCH_ENABLED" "$DEBUG_ENABLED"
     fi
 done
 
-# Print the summary table or a success message
 print_table

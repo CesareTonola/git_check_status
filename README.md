@@ -36,28 +36,37 @@ The script supports the following modes:
    Checks repository status without updating remote references.
 
    ```bash
-   ./check_git_status.sh
+   check_git_status
    ```
 
 2. **Fetch Mode**:
    Runs `git fetch` for each repository before performing checks.
 
    ```bash
-   ./check_git_status.sh fetch
+   check_git_status fetch
    ```
 
 3. **Debug Mode**:
    Outputs detailed information during execution, useful for troubleshooting.
 
    ```bash
-   ./check_git_status.sh debug
+   check_git_status debug
    ```
 
 4. **Fetch + Debug Mode**:
    Combines `fetch` and `debug` modes, updating remote references and providing detailed output.
 
    ```bash
-   ./check_git_status.sh fetch-debug
+   check_git_status fetch-debug
+   ```
+5. **Specifying Directories**:
+   You can also pass specific directories as arguments to limit the scope of the search for Git repositories. The script will recursively explore those directories for any repositories. If no directories are specified, it defaults to searching the current directory.
+      ```bash
+   check_git_status /path/to/workspace1 /path/to/workspace2
+   ```
+   or
+   ```bash
+   check_git_status fetch /path/to/workspace1 /path/to/workspace2
    ```
 
 ---
@@ -72,8 +81,6 @@ The script generates a summary table listing the repositories with detected chan
 |--------------------|-------------------------------------|---------------|
 | example_repo       | Modified but not added/committed   | No            |
 | another_repo       | Branch not in sync with remote     | Yes           |
-
-
 
 
 - **`Status`**: Indicates the repository's local changes.
@@ -115,7 +122,7 @@ All repositories are up-to-date.
 3. **Verify Installation**:
    You should now be able to run the script from any directory:
    ```bash
-   check_git_status.sh
+   check_git_status
    ```
 
 ---
@@ -135,7 +142,6 @@ If you have suggestions to improve the script or encounter any issues, feel free
 
 ## Notes
 
-- The script is designed to work in a workspace with a standard ROS structure (e.g., `src/`), but it can be adapted for other layouts.
 - Without the `fetch` option, the script does not detect changes in branches that are not synced with the remote.
-
+- If you pass directories as arguments, the script will search those specific directories and their subdirectories for Git repositories. If no directories are passed, the script will search the current directory by default.
 ---

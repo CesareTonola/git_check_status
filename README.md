@@ -115,8 +115,8 @@ All repositories are up-to-date.
       ```
 2. **Grant Execute Permissions**:
    ```bash
-   chmod +x /usr/local/bin/check_git_status.sh
-   chmod +x /etc/bash_completion.d/check_git_status
+   sudo chmod +x /usr/local/bin/check_git_status.sh
+   sudo chmod +x /etc/bash_completion.d/check_git_status
    ```
 
 3. **Verify Installation**:

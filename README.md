@@ -77,14 +77,18 @@ The script supports the following modes:
 
 The script generates a summary table listing the repositories with detected changes. Example:
 
-| Package Name      | Status                              | Behind Origin |
-|--------------------|-------------------------------------|---------------|
-| example_repo       | Modified but not added/committed   | No            |
-| another_repo       | Branch not in sync with remote     | Yes           |
+### Summary Table
 
+The script generates a summary table listing the repositories with detected changes. Example:
+
+| Package Name      | Status                              | Behind Origin | Repository Path                                    |
+|--------------------|-------------------------------------|---------------|-----------------------------------------------------|
+| example_repo       | Modified but not added/committed   | No            | /path/to/workspace/example_repo                     |
+| another_repo       | Branch not in sync with remote     | Yes           | /path/to/workspace/another_repo                     |
 
 - **`Status`**: Indicates the repository's local changes.
 - **`Behind Origin`**: Shows whether the local branch is behind the remote (only visible if `fetch` is used).
+- **`Repository Path`**: Displays the full directory path of the repository.
 
 ### When Everything is Clean
 

@@ -1,10 +1,12 @@
 #!/bin/bash
 
 # Pretty output functions
+# Print header section with a title in blue
 print_header() {
     echo -e "\n\e[1;34m=== $1 ===\e[0m"
 }
 
+# Print the list of workspaces being evaluated
 print_workspace_list() {
     echo -e "\n\e[1;34mWorkspaces being evaluated:\e[0m"
     for base_dir in "${WORKSPACE_DIRS[@]}"; do
@@ -16,17 +18,19 @@ print_table() {
     if [ ${#status[@]} -gt 0 ]; then
         if [ "$FETCH_ENABLED" == "true" ]; then
             echo -e "\n\e[1;34mGit Status Summary\e[0m"
-            printf "%-30s | %-40s | %-20s\n" "Package Name" "Status" "Behind Origin"
-            printf "%-30s | %-40s | %-20s\n" "------------------------------" "----------------------------------------" "--------------------"
+            printf "%-30s | %-40s | %-20s | %-60s\n" "Package Name" "Status" "Behind Origin" "Repository Path"
+            printf "%-30s | %-40s | %-20s | %-60s\n" "------------------------------" "----------------------------------------" "--------------------" "------------------------------------------------------------"
             for key in "${!status[@]}"; do
-                printf "%-30s | %-40s | %-20s\n" "$key" "${status[$key]}" "${behind[$key]}"
+                # Print the package name, status, behind status, and full repo path
+                printf "%-30s | %-40s | %-20s | %-60s\n" "$key" "${status[$key]}" "${behind[$key]}" "${repo_paths[$key]}"
             done
         else
             echo -e "\n\e[1;34mGit Status Summary\e[0m"
-            printf "%-30s | %-40s\n" "Package Name" "Status"
-            printf "%-30s | %-40s\n" "------------------------------" "----------------------------------------"
+            printf "%-30s | %-40s | %-60s\n" "Package Name" "Status" "Repository Path"
+            printf "%-30s | %-40s | %-60s\n" "------------------------------" "----------------------------------------" "------------------------------------------------------------"
             for key in "${!status[@]}"; do
-                printf "%-30s | %-40s\n" "$key" "${status[$key]}"
+                # Print the package name, status, and full repo path
+                printf "%-30s | %-40s | %-60s\n" "$key" "${status[$key]}" "${repo_paths[$key]}"
             done
         fi
     else
@@ -34,9 +38,10 @@ print_table() {
     fi
 }
 
-# Declare associative arrays to hold status and behind info
+# Declare associative arrays to hold status, behind info, and repo path
 declare -A status
 declare -A behind
+declare -A repo_paths
 
 # Function to check the Git status of a package
 check_git_status() {
@@ -44,6 +49,9 @@ check_git_status() {
     local pkg_name=$(basename "$dir")
     local fetch_enabled=$2
     local debug_enabled=$3
+
+    # Store the full path to the repository in the associative array
+    repo_paths[$pkg_name]="$dir"
 
     if [ "$debug_enabled" == "true" ]; then
         echo -e "\n\e[1;33m[DEBUG] Checking package: $pkg_name\e[0m"
@@ -57,15 +65,19 @@ check_git_status() {
                 echo -e "\e[1;33m[DEBUG] Fetch completed for $pkg_name\e[0m"
             fi
         fi
+        # Check if there are untracked files (??) in the status
         if git -C "$dir" status --porcelain | grep -q '^??'; then
             status[$pkg_name]="Modified but not added/committed"
         fi
+        # Check if there are staged but not committed changes
         if ! git -C "$dir" diff --cached --quiet; then
             status[$pkg_name]="Staged but not committed"
         fi
+        # Check if there are unstaged but modified changes
         if ! git -C "$dir" diff --quiet; then
             status[$pkg_name]="Modified but not added/committed"
         fi
+        # Check if the repository is behind the origin branch (if fetch is enabled)
         if [ "$fetch_enabled" == "true" ]; then
             local branch=$(git -C "$dir" branch --show-current)
             if ! git -C "$dir" diff --quiet origin/$branch..HEAD; then
@@ -75,6 +87,7 @@ check_git_status() {
                 behind[$pkg_name]="No"
             fi
         fi
+        # Check if there are commits that have not been pushed
         local branch=$(git -C "$dir" branch --show-current)
         if [ -n "$(git -C "$dir" log origin/$branch..HEAD 2>/dev/null)" ]; then
             status[$pkg_name]="Committed but not pushed"
@@ -85,6 +98,7 @@ check_git_status() {
 # Main script starts here
 print_header "Checking Git Status of Packages"
 
+# Default settings for fetch and debug
 FETCH_ENABLED="false"
 DEBUG_ENABLED="false"
 
@@ -144,4 +158,5 @@ for base_dir in "${WORKSPACE_DIRS[@]}"; do
     fi
 done
 
+# Print the final status table with the repository paths
 print_table

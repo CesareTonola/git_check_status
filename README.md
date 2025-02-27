@@ -126,7 +126,7 @@ All repositories are up-to-date.
 3. **Verify Installation**:
    You should now be able to run the script from any directory:
    ```bash
-   check_git_status
+   check_git_status.sh
    ```
 
 ---
